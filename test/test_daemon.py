@@ -321,6 +321,13 @@ class DaemonContext_is_open_TestCase(DaemonContext_BaseTestCase):
                 setattr, instance, 'is_open', object())
 
 
+def make_fake_streams(testcase):
+    """ Make fake system stream files for `testcase`. """
+    testcase.fake_streams = {
+            name: FakeFileDescriptorStringIO()
+            for name in ['stdin', 'stdout', 'stderr']}
+
+
 class DaemonContext_open_TestCase(DaemonContext_BaseTestCase):
     """ Test cases for DaemonContext.open method. """
 
@@ -1249,11 +1256,7 @@ class get_stream_file_descriptors_TestCase(scaffold.TestCase):
         super().setUp()
 
         self.patch_get_maximum_file_descriptors()
-        self.fake_streams = dict(
-                stdin=FakeFileDescriptorStringIO(),
-                stdout=FakeFileDescriptorStringIO(),
-                stderr=FakeFileDescriptorStringIO(),
-                )
+        make_fake_streams(self)
 
     def patch_get_maximum_file_descriptors(self):
         """ Patch the function `get_maximum_file_descriptors`. """
