@@ -20,6 +20,7 @@ import socket
 import sys
 import tempfile
 from types import ModuleType
+import unittest
 import unittest.mock
 
 from . import scaffold
@@ -361,6 +362,7 @@ class DaemonContext_open_TestCase(DaemonContext_BaseTestCase):
         self.mock_module_daemon.attach_mock(
                 unittest.mock.Mock(), 'DaemonContext')
 
+        make_fake_streams(self)
         self.test_files_preserve_fds = object()
         self.test_signal_handler_map = object()
         daemoncontext_method_return_values = {
@@ -538,6 +540,28 @@ class DaemonContext_open_TestCase(DaemonContext_BaseTestCase):
         instance.open()
         self.mock_module_daemon.redirect_stream.assert_has_calls(
                 expected_calls, any_order=True)
+
+    @unittest.skipIf(
+            sys.version_info < (3, 4),
+            "File handle inheritable attribute only in Python 3.4 or later")
+    @unittest.skipIf(
+            sys.platform != 'windows',
+            "File handles implemented only on MS Windows")
+    @unittest.mock.patch.object(os, "set_inheritable")
+    def test_duplicate_is_inheritable(
+            self, mock_func_os_set_inheritable):
+        """ The system streams should be inheritable.
+
+            dup2 sets the new file descriptors to be inhertiable. But if the
+            old and new file descriptors are equal, the inheritable attribute
+            is not changed.
+            If the system streams aren't inheritable they would not be copied
+            to any children of the daemon.
+            """
+        test_stream = self.fake_streams['stdout']
+        stream_fileno = test_stream.fileno()
+        daemon.daemon.redirect_stream(test_stream, test_stream)
+        mock_func_os_set_inheritable.assert_called_with(stream_fileno, True)
 
     def test_enters_pidfile_context(self):
         """ Should enter the PID file context manager. """
