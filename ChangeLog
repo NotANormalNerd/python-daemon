@@ -14,6 +14,14 @@ Version NEXT
 :Released: FUTURE
 :Maintainer: UNKNOWN <unknown@example.org>
 
+Bugs Fixed:
+
+* Set file handles (MS Windows only) of standard streams to be
+  inheritable.
+
+  Closes: Pagure #57. Thanks to Juern Brodersen for the report and
+  test case.
+
 Changed:
 
 * Speed daemon start time by computing candidate file descriptors once.

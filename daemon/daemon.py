@@ -944,6 +944,27 @@ def redirect_stream(system_stream, target_stream):
     else:
         target_fd = target_stream.fileno()
     os.dup2(target_fd, system_stream.fileno())
+    _set_file_handle_inheritable(target_fd)
+
+
+def _set_file_handle_inheritable(handle):
+    """ Set the “inheritable” flag of file handle `handle`.
+
+        :param handle: The file handle value.
+        :return: ``None``.
+
+        See the Python standard library `os` module. Only the
+        `windows` platform uses file handles; the “inheritable” flag
+        only exists in Python 3.4 or later.
+        """
+    try:
+        set_handle_inheritable = os.set_handle_inheritable
+    except AttributeError:
+        # Not available (and not needed) if Python < 3.4, or if the
+        # platform is not MS Windows.
+        pass
+    else:
+        set_handle_inheritable(handle)
 
 
 def make_default_signal_map():
