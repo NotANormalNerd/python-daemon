@@ -367,12 +367,6 @@ class TimeoutPIDLockFile_TestCase(scaffold.TestCase):
         pidlockfile_scenarios = make_pidlockfile_scenarios()
         self.pidlockfile_scenario = pidlockfile_scenarios['simple']
 
-        for func_name in ['__init__', 'acquire']:
-            func_patcher = unittest.mock.patch.object(
-                    lockfile.pidlockfile.PIDLockFile, func_name)
-            func_patcher.start()
-            self.addCleanup(func_patcher.stop)
-
         self.scenario = {
                 'pidfile_path': self.pidlockfile_scenario['pidfile_path'],
                 'acquire_timeout': self.getUniqueInteger(),

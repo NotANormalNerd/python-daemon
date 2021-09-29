@@ -20,6 +20,10 @@ Changed:
 
   Closes: Pagure #40. Thanks to Alex Pyrgiotis for the report.
 
+* Remove incorrect double-patch of objects in test cases.
+
+  Closes: Pagure #62. Thanks to Miro Hrončok for the report.
+
 Removed:
 
 * Drop backward-compatible helpers that provided Python 2 support.
